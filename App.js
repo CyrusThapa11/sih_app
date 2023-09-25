@@ -1,76 +1,29 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TextInput, Button, View } from 'react-native';
-import { useEffect, useState } from 'react';
-import * as MailComposer from 'expo-mail-composer';
-import * as Print from 'expo-print';
+import * as React from "react";
+import { View, Text } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-// expo add expo-print expo-mail-composer
+import HomeScreen from "./screens/Homescreen";
+import EmployeeLogin from "./screens/EmployeeLogin";
+import AuthorityLogin from "./screens/AuthorityLogin";
+import AlarmScreen from "./screens/AlarmScreen";
+// AlarmScreen
+import Login from "./screens/Login";
 
-export default function App() {
-  const [isAvailable, setIsAvailable] = useState(false);
-  const [recipients, setRecipients] = useState([]);
-  const [subject, setSubject] = useState(undefined);
-  const [body, setBody] = useState(undefined);
-  const [email, setEmail] = useState(undefined);
+const Stack = createNativeStackNavigator();
 
-  useEffect(() => {
-    async function checkAvailability() {
-      const isMailAvailable = await MailComposer.isAvailableAsync();
-      setIsAvailable(isMailAvailable);
-    }
-
-    checkAvailability();
-  }, []);
-
-  const sendMail = async () => {
-    const { uri } = await Print.printToFileAsync({
-      html: "<h1>My pdf!</h1>"
-    });
-
-    MailComposer.composeAsync({
-      subject: subject,
-      body: body,
-      recipients: recipients,
-      attachments: [uri]
-    });
-  };
-
-  const addRecipient = () => {
-    let newRecipients = [...recipients];
-    newRecipients.push(email);
-
-    setRecipients(newRecipients);
-    setEmail(undefined);
-  };
-
-  const showRecipients = () => {
-    if (recipients.length === 0) {
-      return <Text>No recipients added</Text>;
-    }
-
-    return recipients.map((recipient, index) => {
-      return <Text key={index}>{recipient}</Text>;
-    });
-  };
-
+function App() {
   return (
-    <View style={styles.container}>
-      <TextInput value={subject} onChangeText={setSubject} placeholder="Subject" />
-      <TextInput value={body} onChangeText={setBody} placeholder="Body" />
-      <TextInput value={email} onChangeText={setEmail} placeholder="Email" />
-      <Button title='Add Recipient' onPress={addRecipient} />
-      {showRecipients()}
-      {isAvailable ? <Button title='Send Mail' onPress={sendMail} /> : <Text>Email not available</Text>}
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="EmployeeLogin" component={EmployeeLogin} />
+        <Stack.Screen name="AuthorityLogin" component={AuthorityLogin} />
+        <Stack.Screen name="AlarmScreen" component={AlarmScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
