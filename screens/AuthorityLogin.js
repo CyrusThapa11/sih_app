@@ -15,6 +15,7 @@ import axios from "axios";
 import Alarm from "react-native-alarm-manager";
 // import { Audio } from "expo-av";
 import moment from "moment";
+import { Audio } from "expo-av";
 // import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // expo add expo-print expo-mail-composer
@@ -27,69 +28,17 @@ const AuthorityLogin = () => {
   const [Sockett, setSockett] = useState(null);
   const [AlarmOn, setAlarmOn] = useState(false);
 
-  var now = new moment().add(5, "seconds");
-  console.log(now.format("HH:mm:ss"));
-  console.log(now);
-
-  function date_time() {
-    var date = new Date();
-    var am_pm = "AM";
-    var hour = date.getHours();
-    if (hour >= 12) {
-      am_pm = "PM";
-    }
-    if (hour == 0) {
-      hour = 12;
-    }
-    if (hour > 12) {
-      hour = hour - 12;
-    }
-    if (hour < 10) {
-      hour = "0" + hour;
-    }
-
-    var minute = date.getMinutes();
-    if (minute < 10) {
-      minute = "0" + minute;
-    }
-    var sec = date.getSeconds();
-    if (sec < 10) {
-      sec = "0" + sec;
-    }
-
-    let datee = hour + ":" + minute + ":" + sec + " " + am_pm;
-  }
-  // async function playSound() {
-  //   console.log("Loading Sound");
-  //   const { sound } = await Audio.Sound.createAsync(
-  //     require("../assets/classic-alarm-1.mp3")
-  //   );
-  //   setSound(sound);
-
-  //   console.log("Playing Sound");
-  //   await sound.playAsync();
-  // }
-  // const date = new Date();
-  console.log(toString(now.format("HH:mm:ss")));
-  const alarm = {
-    alarm_id: 10,
-    alarm_time: toString(now.format("HH:mm:ss")), // HH:mm:00
-    alarm_title: "ALERT",
-    alarm_text: "ALERT",
-    alarm_sound: require("../assets/classic-alarm-1.mp3"), // sound.mp3
-    alarm_icon: "icon", // icon.png
-    alarm_sound_loop: true,
-    alarm_vibration: true,
-    alarm_noti_removable: true,
-    alarm_activate: true,
-  };
-  const raiseAlarm = (data, send) => {
-    console.log(" logic here ");
-    Sockett.send(
-      JSON.stringify({
-        message: " alarm BAJADO RE.... ",
-      })
+  const handlePlay = async () => {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/classic-alarm-1.mp3")
     );
+    setSound(sound);
+    await sound.playAsync();
+  };
+
+  const handleStop = async () => {
+    await sound.stopAsync();
+    setSound(null);
   };
 
   const connectToSocket = async () => {
@@ -115,18 +64,13 @@ const AuthorityLogin = () => {
 
       let data = JSON.parse(e.data);
       console.log("data ", data);
-      // raiseAlarm();
-      // raise alarm !
-      // Alarm.schedule(
-      //   alarm,
-      //   (success) => console.log(success), // success message
-      //   (fail) => console.log(fail) // fail message
-      // );
-      // AlarmOn(true);
+
+      handlePlay(); // THIS WILL RUN THE ALARM AUDIO
+
       Alert.alert("ALERT !", `${data.description}`, [
         {
           text: "Cancel",
-          onPress: () => console.log("Cancel Pressed"),
+          onPress: () => handleStop(), //
           style: "cancel",
         },
         { text: "OK", onPress: () => console.log("OK Pressed") },
@@ -141,13 +85,7 @@ const AuthorityLogin = () => {
     console.log("socket ", soc);
     setSockett(soc);
   };
-  const StopAlarm = () => {
-    Alarm.stop(
-      (success) => console.log(success), // success message
-      (fail) => console.log(fail) // fail message
-    );
-    AlarmOn(false);
-  };
+
   const handleLogin = async () => {
     console.log("email", email);
     console.log("password", password);
@@ -190,7 +128,12 @@ const AuthorityLogin = () => {
         style={styles.input}
       />
       <Button title="Login" onPress={handleLogin} />
-      {AlarmOn && <Button title="Stop Alarm" onPress={StopAlarm} />}
+      {/* {AlarmOn && (
+        <View>
+          <Button title="Play" onPress={handlePlay} />
+          <Button title="Stop" onPress={handleStop} />
+        </View>
+      )} */}
     </View>
   );
 };
@@ -215,14 +158,5 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
   },
 });
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: "#fff",
-//     alignItems: "center",
-//     justifyContent: "center",
-//   },
-// });
 
 export default AuthorityLogin;

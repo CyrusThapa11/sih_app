@@ -4,11 +4,25 @@ import { View, Text, Button } from "react-native";
 import WS from "react-native-websocket";
 import { Component } from "react";
 import { AppRegistry } from "react-native";
+import { Audio } from "expo-av";
 
 const AlarmScreen = () => {
   const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(null);
+  const [sound, setSound] = useState(null);
 
+  const handlePlay = async () => {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/classic-alarm-1.mp3")
+    );
+    setSound(sound);
+    await sound.playAsync();
+  };
+
+  const handleStop = async () => {
+    await sound.stopAsync();
+    setSound(null);
+  };
   //   useEffect(() => {
   //     // Create a WebSocket connection when the component mounts
   //     const ws = new WebSocket("ws://127.0.0.1:8000/");
@@ -47,24 +61,29 @@ const AlarmScreen = () => {
   //     }
   //   };
 
-  //   return (
-  //     <View style={{ flex: 1 }}>
-  //       <WS
-  //         ref={(ref) => {
-  //           this.ws = ref;
-  //         }}
-  //         url="wss://echo.websocket.org/"
-  //         onOpen={() => {
-  //           console.log("Open!");
-  //           this.ws.send("Hello");
-  //         }}
-  //         onMessage={console.log}
-  //         onError={console.log}
-  //         onClose={console.log}
-  //         reconnect // Will try to reconnect onClose
-  //       />
-  //     </View>
-  //   );
+  return (
+    // <View style={{ flex: 1 }}>
+    //   <WS
+    //     ref={(ref) => {
+    //       this.ws = ref;
+    //     }}
+    //     url="wss://echo.websocket.org/"
+    //     onOpen={() => {
+    //       console.log("Open!");
+    //       this.ws.send("Hello");
+    //     }}
+    //     onMessage={console.log}
+    //     onError={console.log}
+    //     onClose={console.log}
+    //     reconnect // Will try to reconnect onClose
+    //   />
+    // </View>
+
+    <View>
+      <Button title="Play" onPress={handlePlay} />
+      <Button title="Stop" onPress={handleStop} />
+    </View>
+  );
 };
 
 export default AlarmScreen;
